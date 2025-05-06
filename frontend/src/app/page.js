@@ -241,7 +241,7 @@ export default function Home() {
           !error && (
             <div className="meaningLessInput">
               <h4>
-                Oops! We couldn't understand that sentence or determine if it
+                Oops! We couldn&apos;t understand that sentence or determine if it
                 was a fact.
               </h4>
               <h4>Please try with another query.</h4>

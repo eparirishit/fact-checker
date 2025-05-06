@@ -47,6 +47,7 @@ function RadioBox(props) {
       >
         {props.options.map((d, i) => (
           <FormControlLabel
+            key={d.id || i}
             value={props.int === 1 ? parseInt(d.id) : d.id}
             className={
               props.value && props.value == d.id ? "checked" : "unChecked"
