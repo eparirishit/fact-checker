@@ -1,0 +1,41 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main, dev ]
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Build backend image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/fact-checker-backend:latest ./backend
+
+      - name: Build frontend image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/fact-checker-frontend:latest ./frontend
+
+      - name: Push backend image
+        run: docker push ghcr.io/${{ github.repository }}/fact-checker-backend:latest
+
+      - name: Push frontend image
+        run: docker push ghcr.io/${{ github.repository }}/fact-checker-frontend:latest
+      
+      - name: Deploy using Docker Compose
+        run: docker compose config
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+          SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY }}

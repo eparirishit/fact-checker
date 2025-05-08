@@ -1,86 +1,53 @@
 
-# Fact Checker - Frontend
+# Fact Checker
 
-A Next.js application for fact-checking statements and claims.
+## Approach
 
-Overview
---------
-This frontend application provides an intuitive interface for users to submit statements for fact-checking, and view results. Built with Next.js, it offers fast performance, server-side rendering, and a responsive design.
-
-Getting Started
----------------
-Prerequisites:
-- Node.js 16.x or later
-- npm or yarn package manager
-
-Installation:
-
-1. Clone the repository:
-```
-git clone https://github.com/the-sniper/fact-checker.git
-cd fact-checker/frontend
-```
-
-2. Install dependencies:
-```
-npm install
-```
-
-3. Start the development server:
-```
-npm run dev
-```
-
-4. Open the application: `http://localhost:3000` in your browser to see the application.
+In developing Fact Checker, we adopted a user-centered design methodology to ensure that the platform caters to the needs of users who seek accurate information. By integrating advanced AI technologies, we provide a reliable fact-checking platform that processes statements and claims with precision.
 
 
+## Vision and Innovation
 
-# Fact Checker - Backend
+Fact Checker aims to empower individuals by providing a trustworthy and AI-driven fact-checking solution. Our vision is to combat misinformation and promote truth by delivering accurate and efficient results.
 
-The API and machine learning backend for the Fact Checker application.
 
-Getting Started
----------------
-Prerequisites:
-- Python 3.8+ or Node.js 14+ (depending on your backend)
-- pip or npm package manager
-- Virtual environment tool (recommended, e.g., venv, conda)
+## Identifying Unique Challenges
 
-Installation:
+We recognized that misinformation is a growing challenge in the digital age. People often struggle to verify claims due to a lack of tools, expertise, or time. Additionally, processing large-scale and diverse data sources presents a significant challenge.
 
-1. Navigate to the backend directory:
-```
-cd fact-checker/backend
-```
 
-2. Set up a virtual environment (Python backend):
+## Resolving Complex Problems
 
- On Linux/Mac:
-```
-python -m venv venv
-source venv/bin/activate
-```
+To address these challenges, Fact Checker leverages powerful AI models to analyze statements, gather relevant data, and provide accurate results. Our platform offers flexibility for users to submit claims, view detailed verification reports, and ensure transparency in the process.
 
-On Windows:
-```
-python -m venv venv
-venv\Scripts\activate
-```
 
-3. Install dependencies:
-```
-pip install -r requirements.txt
-```
+## User-Centric Design
 
-4. Create a .env file with the following variables:
-    - `OPENAI_API_KEY=<<YOUR_OPENAI_API_KEY>>`
-    - `SERPER_API_KEY=<<YOUR_SERPER_API_KEY>>`
-    - `SCRAPER_API_KEY=<<YOUR_SCRAPER_API_KEY>>`
+The platform is designed with simplicity in mind for both users and developers. The frontend provides an intuitive interface for submitting claims and viewing results, while the backend ensures high performance and scalability.
 
-5. Start the development server:
-```
-python -m app.app --port 8000
-```
+
+## Detailed Pages and Features
+
+- **How It Works**: A seamless process for submitting claims and getting results.
+- **Verification Sources**: Uses advanced AI models and APIs like OpenAI, Serper, and Scraper to gather and verify information.
+- **Testimonials**: Real users sharing how Fact Checker has improved their decision-making.
+- **Transparency**: Open-source backend and frontend for community trust and contribution.
+
+
+
+## Conclusion
+
+Fact Checker exemplifies innovation in combating misinformation. By combining AI technology with user-centered design, we enable individuals to make informed decisions with confidence.
+
+
+## Folder Structure
+
+- **Frontend**: The user-facing Next.js application.
+- **Backend**: The API and machine learning backend.
+
+For detailed setup instructions for each component, see the respective README files in the `frontend` and `backend` directories.
+
+
 
 ### Working Video -
 `https://www.loom.com/share/391e17637fcb4e4b834ec11532c08b0d?sid=59cdb1bd-33ba-4c32-a2c8-aa6db2b048e8`

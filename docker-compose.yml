@@ -11,10 +11,11 @@ services:
       - ./backend:/app
       - backend_data:/app/data
     environment:
-      - CONFIG_PATH=config.json
-      - ENV_FILE=.env
-    env_file:
-      - ./backend/.env
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+      - SERPER_API_KEY=$SERPER_API_KEY
+      - SCRAPER_API_KEY=$SCRAPER_API_KEY
+    # env_file:
+    #   - ./backend/.env
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
