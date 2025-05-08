@@ -32,10 +32,3 @@ jobs:
 
       - name: Push frontend image
         run: docker push ghcr.io/${{ github.repository }}/fact-checker-frontend:latest
-
-      - name: Deploy using Docker Compose
-        run: docker compose up --build -d
-        env:
-          OPENAI_API_KEY: $${{ secrets.OPENAI_API_KEY }}
-          SERPER_API_KEY: $${{ secrets.SERPER_API_KEY }}
-          SCRAPER_API_KEY: $${{ secrets.SCRAPER_API_KEY }}
