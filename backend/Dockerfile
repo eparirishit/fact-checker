@@ -1,6 +1,6 @@
-FROM python:3.10-slim
+FROM python:3.11-slim
 
-WORKDIR /app
+WORKDIR /backend
 
 # Install system dependencies including git
 RUN apt-get update && \
