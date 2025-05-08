@@ -119,11 +119,37 @@ def create_app() -> FastAPI:
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error getting components: {str(e)}")
 
+    @app.get("/health")
+    async def get_health(req: Request):
+        """
+        Perform a health check to ensure the service and its components are operational.
+        """
+        try:
+            ofc = req.app.state.ofc
+
+            if not ofc:
+                raise Exception("OpenFactCheck instance is not initialized.")
+
+            # Perform a basic check on components
+            claimprocessors = ofc.list_claimprocessors()
+            retrievers = ofc.list_retrievers()
+            verifiers = ofc.list_verifiers()
+
+            # Ensure components are available
+            if not claimprocessors or not retrievers or not verifiers:
+                raise Exception("One or more components are unavailable.")
+
+            return {"status": "healthy", "details": "All components are operational."}
+        except Exception as e:
+            error_details = traceback.format_exc()
+            print(f"Health check failed: {error_details}")
+            raise HTTPException(status_code=500, detail=f"Service is unhealthy: {str(e)}")
+
     return app
 
 if __name__ == "__main__":
     def parse_args():
-        parser = argparse.ArgumentParser(description="FastAPI application for OpenFactCheck.")
+        parser = argparse.ArgumentParser(description="FastAPI application for Factchecker.")
         parser.add_argument("--config-path", type=str, default="config.json", help="Config file path")
         parser.add_argument("--port", type=int, default=8000, help="Port to run the server on")
         parser.add_argument("--env-file", type=str, default=".env", help="Path to .env file")
