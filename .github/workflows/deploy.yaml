@@ -24,19 +24,19 @@ jobs:
 
       - name: Build and push backend image
         run: |
-          docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker/fact-checker-backend:latest ./backend
-          docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker/fact-checker-backend:latest
+          docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker-repo/fact-checker-backend:latest ./backend
+          docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker-repo/fact-checker-backend:latest
 
       - name: Build and push frontend image
         run: |
-          docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker/fact-checker-frontend:latest ./frontend
-          docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker/fact-checker-frontend:latest
+          docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker-repo/fact-checker-frontend:latest ./frontend
+          docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker-repo/fact-checker-frontend:latest
 
       - name: Deploy backend to Cloud Run
         id: deploy-backend
         run: |
           gcloud run deploy fact-checker-backend \
-            --image=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker/fact-checker-backend:latest \
+            --image=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker-repo/fact-checker-backend:latest \
             --region=${{ secrets.GCP_REGION }} \
             --platform=managed \
             --allow-unauthenticated \
@@ -55,7 +55,7 @@ jobs:
       - name: Deploy frontend to Cloud Run
         run: |
           gcloud run deploy fact-checker-frontend \
-            --image=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker/fact-checker-frontend:latest \
+            --image=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker-repo/fact-checker-frontend:latest \
             --region=${{ secrets.GCP_REGION }} \
             --platform=managed \
             --allow-unauthenticated \
