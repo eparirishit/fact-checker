@@ -6,36 +6,57 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Log in to GHCR
-        uses: docker/login-action@v2
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
         with:
-          registry: ghcr.io
-          username: ${{ secrets.GHCR_USERNAME }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
 
-      - name: Build backend image
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev
+
+      - name: Build and push backend image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/fact-checker-backend:latest ./backend
+          docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker/fact-checker-backend:latest ./backend
+          docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker/fact-checker-backend:latest
 
-      - name: Build frontend image
+      - name: Build and push frontend image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/fact-checker-frontend:latest ./frontend
+          docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker/fact-checker-frontend:latest ./frontend
+          docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker/fact-checker-frontend:latest
 
-      - name: Push backend image
-        run: docker push ghcr.io/${{ github.repository }}/fact-checker-backend:latest
+      - name: Deploy backend to Cloud Run
+        id: deploy-backend
+        run: |
+          gcloud run deploy fact-checker-backend \
+            --image=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker/fact-checker-backend:latest \
+            --region=${{ secrets.GCP_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --set-env-vars=OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }},SERPER_API_KEY=${{ secrets.SERPER_API_KEY }},SCRAPER_API_KEY=${{ secrets.SCRAPER_API_KEY }}
 
-      - name: Push frontend image
-        run: docker push ghcr.io/${{ github.repository }}/fact-checker-frontend:latest
-      
-      - name: Deploy using Docker Compose
-        run: docker compose config
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
-          SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY }}
+      - name: Get backend Cloud Run URL
+        id: get-backend-url
+        run: |
+          BACKEND_URL=$(gcloud run services describe fact-checker-backend \
+            --region=${{ secrets.GCP_REGION }} \
+            --platform=managed \
+            --format='value(status.url)')
+          echo "BACKEND_URL=$BACKEND_URL"
+          echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
+
+      - name: Deploy frontend to Cloud Run
+        run: |
+          gcloud run deploy fact-checker-frontend \
+            --image=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker/fact-checker-frontend:latest \
+            --region=${{ secrets.GCP_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --set-env-vars=NEXT_PUBLIC_API_URL=${BACKEND_URL},NODE_ENV=production
