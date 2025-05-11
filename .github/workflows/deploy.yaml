@@ -24,13 +24,10 @@ jobs:
 
       - name: Build and push backend image
         run: |
-          docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker-repo/fact-checker-backend:latest ./backend
-          docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker-repo/fact-checker-backend:latest
-
-      - name: Build and push frontend image
-        run: |
-          docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker-repo/fact-checker-frontend:latest ./frontend
-          docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker-repo/fact-checker-frontend:latest
+          docker buildx create --use
+          docker buildx build --platform linux/amd64 \
+            -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker-repo/fact-checker-backend:latest \
+            ./backend --push
 
       - name: Deploy backend to Cloud Run
         id: deploy-backend
@@ -40,6 +37,8 @@ jobs:
             --region=${{ secrets.GCP_REGION }} \
             --platform=managed \
             --allow-unauthenticated \
+            --memory=8Gi \
+            --cpu=4 \
             --set-env-vars=OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }},SERPER_API_KEY=${{ secrets.SERPER_API_KEY }},SCRAPER_API_KEY=${{ secrets.SCRAPER_API_KEY }}
 
       - name: Get backend Cloud Run URL
@@ -52,6 +51,13 @@ jobs:
           echo "BACKEND_URL=$BACKEND_URL"
           echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
 
+      - name: Build and push frontend image
+        run: |
+          docker buildx build --platform linux/amd64 \
+            --build-arg NEXT_PUBLIC_API_URL=${BACKEND_URL} \
+            -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fact-checker-repo/fact-checker-frontend:latest \
+            ./frontend --push
+
       - name: Deploy frontend to Cloud Run
         run: |
           gcloud run deploy fact-checker-frontend \
@@ -59,4 +65,4 @@ jobs:
             --region=${{ secrets.GCP_REGION }} \
             --platform=managed \
             --allow-unauthenticated \
-            --set-env-vars=NEXT_PUBLIC_API_URL=${BACKEND_URL},NODE_ENV=production
+            --set-env-vars=NODE_ENV=production
