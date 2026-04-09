@@ -11,9 +11,5 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     }
-  ],
-  "env": {
-    "BACKEND_API_URL": "https://rishit-epari-fact-checker-backend.hf.space",
-    "HF_TOKEN": "@hf_token"
-  }
+  ]
 }
