@@ -1,0 +1,41 @@
+# Keeps the Hugging Face Space from sleeping by hitting GET /health on a schedule.
+#
+# Required repo secret:
+#   BACKEND_API_URL — e.g. https://your-name-your-space.hf.space (no trailing slash)
+# Private Spaces:
+#   HF_TOKEN — same read token you use for API auth
+#
+# Schedule: 4× daily (every 6 hours UTC). Edit the cron below to change frequency.
+
+name: Keep HF Space warm
+
+on:
+  schedule:
+    # 00:00, 06:00, 12:00, 18:00 UTC
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Space /health
+        env:
+          BASE_URL: ${{ secrets.BACKEND_API_URL }}
+          TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BASE_URL:-}" ]; then
+            echo "Missing secret BACKEND_API_URL"
+            exit 1
+          fi
+          BASE_URL="${BASE_URL%/}"
+          if [ -n "${TOKEN:-}" ]; then
+            curl -fsS -m 120 \
+              -H "Authorization: Bearer ${TOKEN}" \
+              "${BASE_URL}/health"
+          else
+            curl -fsS -m 120 \
+              "${BASE_URL}/health"
+          fi
+          echo "OK"

@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "ignoreCommand": "git diff HEAD~1 --name-only | grep -q '^frontend/'",
+  "ignoreCommand": "git diff HEAD~1 --name-only | grep -q '^frontend/' && exit 1 || exit 0",
   "headers": [
     {
       "source": "/(.*)",
