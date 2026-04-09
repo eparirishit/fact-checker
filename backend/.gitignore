@@ -1,96 +1,81 @@
-# Byte-compiled / optimized / DLL files
-*__pycache__/
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-
-# Distribution / packaging
-.Python
+*.egg
+*.egg-info/
+.eggs/
+dist/
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
-.eggs/
 lib64/
 parts/
 sdist/
 var/
-*.egg-info/
 .installed.cfg
-*.egg
+.Python
 
-# Virtual environments
-*venv/
+# ── Virtual environments ───────────────────────────────────────────────────────
+venv/
+.venv/
 ENV/
 env/
 env.bak/
 venv.bak/
 
-# PyInstaller
-*.manifest
-*.spec
+# ── Secrets / environment ──────────────────────────────────────────────────────
+.env
+.env.*
+config.json
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+# ── ML model & HuggingFace caches ─────────────────────────────────────────────
+.cache/
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+models/
 
-# Unit test / coverage reports
+# ── Runtime / temporary data ──────────────────────────────────────────────────
+tmp/
+data/
+*.log
+
+# ── Testing & coverage ────────────────────────────────────────────────────────
+.pytest_cache/
 htmlcov/
 .tox/
 .nox/
 .coverage
 .coverage.*
-.cache
-nosetests.xml
 coverage.xml
 *.cover
-.pytest_cache/
+nosetests.xml
 
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# IPython Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# mypy
+# ── Type checkers ─────────────────────────────────────────────────────────────
 .mypy_cache/
-
-# Pyre type checker
 .pyre/
 
-# VS Code
-.vscode/
+# ── Notebooks ─────────────────────────────────────────────────────────────────
+.ipynb_checkpoints
 
-# IDE directories and files
+# ── IDE / OS ──────────────────────────────────────────────────────────────────
+.vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace
+.DS_Store
 
-# dotenv file (do not commit sensitive data)
-.env
-
-*tmp/
+# ── Misc ──────────────────────────────────────────────────────────────────────
+*.mo
+*.pot
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+.pyenv-version
+.python-version

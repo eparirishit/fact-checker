@@ -1,21 +1,39 @@
-FROM node:18-alpine
+FROM node:18-alpine AS base
 
+# --- Dependencies ---
+FROM base AS deps
 WORKDIR /app
-
-# Copy package files first to leverage Docker cache
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
-# Copy the rest of the application
+# --- Build ---
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build with env variable
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 RUN npm run build
 
-# Expose the port the app runs on
-EXPOSE 3000
+# --- Production ---
+FROM base AS runner
+WORKDIR /app
 
-# Command to run the application
-CMD ["npm", "start"]
+ENV NODE_ENV=production
+
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]
