@@ -146,7 +146,7 @@ class OpenAIChat:
 
             preds = [
                 self._type_check(self._boolean_fix(prediction.choices[0].message.content), expected_type)
-                if prediction is not None
+                if prediction is not None and not isinstance(prediction, BaseException)
                 else None
                 for prediction in predictions
             ]

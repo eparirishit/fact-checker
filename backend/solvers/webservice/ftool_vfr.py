@@ -15,7 +15,14 @@ class FactoolVerifier(StandardTaskSolver):
 
     def __call__(self, state: FactCheckerState, *args, **kwargs):
         claims_with_evidences = state.get(self.input_name)
-        results = self._verification(claims_with_evidences)
+        raw_results = self._verification(claims_with_evidences)
+
+        # Replace None (failed OpenAI calls) with a safe fallback so iteration doesn't crash
+        results = [
+            r if r is not None else {"factuality": False, "error": "Verification failed: no response from OpenAI"}
+            for r in raw_results
+        ]
+
         for i, k in enumerate(list(claims_with_evidences.keys())):
             results[i]["claim"] = k
             results[i]["evidences"] = claims_with_evidences[k]

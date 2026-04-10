@@ -109,10 +109,17 @@ class GoogleSerperAPIWrapper():
                 sublist = ['None', 'None']
             for item in sublist:
                 flattened_queries.append(item)
+
         results = asyncio.run(self.parallel_searches(flattened_queries, gl=self.gl, hl=self.hl))
+
         snippets_list = []
-        for i in range(len(results)):
-            snippets_list.append(self._parse_results(results[i]))
+        for result in results:
+            if isinstance(result, BaseException):
+                snippets_list.append([{"content": "Search failed: " + str(result), "source": "None"}])
+            else:
+                snippets_list.append(self._parse_results(result))
+
+        # Each claim generates 2 queries; pair them back together
         snippets_split = [snippets_list[i] + snippets_list[i + 1] for i in range(0, len(snippets_list), 2)]
         return snippets_split
 

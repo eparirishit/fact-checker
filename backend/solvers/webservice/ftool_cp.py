@@ -18,7 +18,13 @@ class FactoolClaimProcessor(StandardTaskSolver):
 
         claims = self._claim_extraction(responses=[response])[0]
 
-        extracted_claims = [claim["claim"] for claim in claims]
+        if claims is None:
+            raise RuntimeError(
+                "Claim extraction failed: OpenAI returned no result. "
+                "Check your OPENAI_API_KEY and model quota."
+            )
+
+        extracted_claims = [claim["claim"] for claim in claims if isinstance(claim, dict) and "claim" in claim]
 
         state.set(self.output_name, extracted_claims)
         return True, state

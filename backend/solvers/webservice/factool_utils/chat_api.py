@@ -114,7 +114,7 @@ class OpenAIChat:
         """
 
         async def _request_with_retry(messages, retry=3):
-            for _ in range(retry):
+            for attempt in range(retry):
                 try:
                     response = await self.client.chat.completions.create(
                         model=self.config["model_name"],
@@ -125,30 +125,13 @@ class OpenAIChat:
                     )
                     return response
                 except openai.RateLimitError:
-                    await asyncio.sleep(1)
-                except openai.Timeout:
-                    await asyncio.sleep(1)
-                except openai.APIError:
-                    await asyncio.sleep(1)
-                # except openai.err
+                    await asyncio.sleep((2 ** attempt) * 0.5)
+                except (openai.Timeout, openai.APIError):
+                    await asyncio.sleep((2 ** attempt) * 0.5)
+                except Exception:
+                    await asyncio.sleep((2 ** attempt) * 0.5)
 
-                # except openai.error.RateLimitError:
-                #     print('Rate limit error, waiting for 40 second...')
-                #     await asyncio.sleep(40)
-                # except openai.error.APIError:
-                #     print('API error, waiting for 1 second...')
-                #     await asyncio.sleep(1)
-                # except openai.error.Timeout:
-                #     print('Timeout error, waiting for 1 second...')
-                #     await asyncio.sleep(1)
-                # except openai.error.ServiceUnavailableError:
-                #     print('Service unavailable error, waiting for 3 second...')
-                #     await asyncio.sleep(3)
-                # except openai.error.APIConnectionError:
-                #     print('API Connection error, waiting for 3 second...')
-                #     await asyncio.sleep(3)
-
-            return None
+            raise RuntimeError("All retries failed for OpenAI API request")
 
         async_responses = [_request_with_retry(messages) for messages in messages_list]
 
@@ -172,7 +155,7 @@ class OpenAIChat:
                 self._type_check(
                     self._boolean_fix(self._json_fix(prediction.choices[0].message.content)), expected_type
                 )
-                if prediction is not None
+                if prediction is not None and not isinstance(prediction, BaseException)
                 else None
                 for prediction in predictions
             ]
